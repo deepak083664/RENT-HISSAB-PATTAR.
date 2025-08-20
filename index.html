@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SUBHAM RENTER'S HOUSE BILL GENERATOR</title>
+<style>
+  body{font-family:Arial, sans-serif; background:#3cd2ea; color:#222; margin:0; padding:20px;}
+  h1{text-align:center;color:#141413;}
+  .card{max-width:600px; margin:20px auto; background:#e6e8e8; padding:20px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,.1);}
+  label{display:block; margin:10px 0 4px; font-weight:bold;}
+  input{width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;}
+  button{margin-top:15px; padding:10px 14px; border:none; border-radius:6px; background:#0077ff; color:white; font-weight:bold; cursor:pointer;}
+  button:hover{background:#45a2e0;}
+  #bill{margin-top:20px; display:none; background:#fff; padding:20px; border:1px solid #ddd; border-radius:12px;}
+  table{width:100%; border-collapse:collapse; margin-top:10px;}
+  th,td{border:1px solid #0d0672; padding:8px; text-align:left;}
+  th{background:#04b7cf;}
+  .total{text-align:right; font-size:18px; font-weight:bold;}
+</style>
+</head>
+<body>
+
+<h1>🏠 SUBHAM RENTER'S HOUSE</h1>
+
+<div class="card">
+  <label>Renter Name</label>
+  <input type="text" id="renter">
+
+  <label>Room Number</label>
+  <input type="text" id="room">
+
+  <label>Room Rent (₹)</label>
+  <input type="number" id="rent">
+
+  <label>Electricity Initial Reading (kWh)</label>
+  <input type="number" id="init">
+
+  <label>Electricity Final Reading (kWh)</label>
+  <input type="number" id="final">
+
+  <label>Rate per Unit (₹)</label>
+  <input type="number" id="rate" value="10">
+
+  <label>Bill Paid Date</label>
+  <input type="date" id="paidDate">
+
+  <button onclick="generateBill()">Generate Bill</button>
+  <button onclick="downloadImage()">Download as Image</button>
+</div>
+
+<div id="bill">
+  <h2 style="text-align:center;color:#0d0672;text-decoration:underline;">SUBHAM RENTER'S HOUSE</h2>
+  <h2 style="text-align:left;color:#f11f1f;text-decoration:underline;">RENT BILL</h2>
+  <p><strong>Renter name:</strong> <span id="b_renter"></span></p>
+  <p><strong>Room No:</strong> <span id="b_room"></span></p>
+  <p><strong>Paid Date:</strong> <span id="b_date"></span></p>
+
+  <table>
+    <tr><th>Description</th><th>Amount (₹)</th></tr>
+    <tr><td>Room Rent</td><td id="b_rent"></td></tr>
+    <tr><td>Electricity (Units × Rate)</td><td id="b_elec"></td></tr>
+    <tr><td colspan="2" class="total">Total: ₹ <span id="b_total"></span></td></tr>
+  </table>
+</div>
+
+<!-- html2canvas for capturing image -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script>
+function generateBill(){
+  let renter = document.getElementById("renter").value.trim();
+  let room = document.getElementById("room").value.trim();
+  let rent = parseFloat(document.getElementById("rent").value) || 0;
+  let init = parseFloat(document.getElementById("init").value) || 0;
+  let final = parseFloat(document.getElementById("final").value) || 0;
+  let rate = parseFloat(document.getElementById("rate").value) || 0;
+  let date = document.getElementById("paidDate").value;
+
+  if(final < init){
+    alert("⚠️ Final reading initial se kam nahi ho sakta!");
+    return;
+  }
+
+  let units = final - init;
+  let elecBill = units * rate;
+  let total = rent + elecBill;
+
+  document.getElementById("b_renter").innerText = renter || "-";
+  document.getElementById("b_room").innerText = room || "-";
+  document.getElementById("b_date").innerText = date || "-";
+  document.getElementById("b_rent").innerText = rent.toFixed(2);
+  document.getElementById("b_elec").innerText = elecBill.toFixed(2);
+  document.getElementById("b_total").innerText = total.toFixed(2);
+
+  document.getElementById("bill").style.display = "block";
+}
+
+function downloadImage(){
+  let bill = document.getElementById("bill");
+  if(bill.style.display === "none"){
+    alert("⚠️ Pehle Bill generate kijiye!");
+    return;
+  }
+  html2canvas(bill).then(canvas => {
+    let link = document.createElement("a");
+    link.download = "Rent_Bill.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  });
+}
+</script>
+
+</body>
+</html>
